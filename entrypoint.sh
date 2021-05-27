@@ -42,6 +42,8 @@ set_auth() {
     echo "host_bucket=%(bucket)s.$ENDPOINT" >> "$s3cnf"
   fi
 
+  echo "use_https=True" >> "$s3cnf"
+
   echo "Generated .s3cfg for key $ACCESS_KEY"
 }
 
@@ -65,15 +67,19 @@ main() {
     fail 'BUCKET is not set. Quitting.'
   fi
 
+  if [ -z "$SOURCES" ]; then
+    fail 'SOURCES is not set. Quitting.'
+  fi
+
   if [ -z "$OPTIONS" ]; then
     OPTIONS=""
   fi
 
-  command="s3cmd put $SOURCES s3://$BUCKET/$TARGET $OPTIONS"
+  COMMAND="s3cmd put $SOURCES s3://$BUCKET/$TARGET/ $OPTIONS"
 
-  debug $command
+  debug $COMMAND
 
-  bash -c $command
+  bash -c $COMMAND
   RESULT=$?
 
   if [[ $? -eq 0 ]]; then
