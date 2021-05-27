@@ -1,0 +1,9 @@
+name: "S3CMD Sync Action"
+description: "Sync a file with S3 bucket using s3cmd with add headers"
+author: TrungLD
+runs:
+  using: docker
+  image: Dockerfile
+branding:
+  icon: refresh-cw
+  color: green
