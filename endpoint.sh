@@ -37,6 +37,11 @@ set_auth() {
   echo "access_key=$ACCESS_KEY" >> "$s3cnf"
   echo "secret_key=$SECRET_KEY" >> "$s3cnf"
 
+  if [ -n "$ENDPOINT" ]; then
+    echo "host_base=$ENDPOINT" >> "$s3cnf"
+    echo "host_bucket=%(bucket)s.$ENDPOINT" >> "$s3cnf"
+  fi
+
   echo "Generated .s3cfg for key $ACCESS_KEY"
 }
 
@@ -48,10 +53,6 @@ main() {
   info 'Check s3cmd version'
   info $(s3cmd --version)
 
-  if [ -z "$BUCKET" ]; then
-    fail 'AWS_S3_BUCKET is not set. Quitting.'
-  fi
-
   if [ -z "$ACCESS_KEY" ]; then
     fail 'ACCESS_KEY is not set. Quitting.'
   fi
@@ -60,22 +61,15 @@ main() {
     fail 'AWS_SECRET_ACCESS_KEY is not set. Quitting.'
   fi
 
-  if [ -z "$EXTRA_OPTS" ]; then
-      EXTRA_OPTS="--verbose"
+  if [ -z "$BUCKET" ]; then
+    fail 'BUCKET is not set. Quitting.'
   fi
 
-  if [ -z "$ADD_HEADERS" ]; then
-      ADD_HEADERS=""
+  if [ -z "$OPTIONS" ]; then
+    OPTIONS=""
   fi
 
-  export IFS='|'
-  for header in $ADD_HEADERS; do
-    HEADERS="--add-header=\"$header\" $HEADERS"
-  done
-
-  COMMAND_SUFIX="$FILE s3://$AWS_S3_BUCKET"
-
-  command="s3cmd put --no-preserve $EXTRA_OPTS $HEADERS $COMMAND_SUFIX"
+  command="s3cmd put $SOURCES s3://$BUCKET/$TARGET $OPTIONS"
 
   debug $command
 
