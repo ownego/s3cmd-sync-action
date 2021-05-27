@@ -75,18 +75,9 @@ main() {
     OPTIONS=""
   fi
 
-  COMMAND="s3cmd put $SOURCES s3://$BUCKET/$TARGET/ $OPTIONS"
+  RESULT=$(s3cmd put $SOURCES s3://$BUCKET/$TARGET/ $OPTIONS)
 
-  debug $COMMAND
-
-  bash -c $COMMAND
-  RESULT=$?
-
-  if [[ $? -eq 0 ]]; then
-      success 'Finished S3 Synchronisation';
-  else
-      fail 'Failed s3cmd command';
-  fi
+  echo $RESULT;
 
   warn 'Removing .s3cfg credentials'
   rm "$HOME/.s3cfg"
